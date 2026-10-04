@@ -134,9 +134,10 @@ export async function POST(
       return NextResponse.json(
         {
           error:
-            error.statusCode === 429
+            error.message ||
+            (error.statusCode === 429
               ? "Too many requests, wait a moment"
-              : "AI response failed, please try again",
+              : "AI response failed, please try again"),
         },
         { status: error.statusCode }
       );

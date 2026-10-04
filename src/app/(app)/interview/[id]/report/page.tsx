@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -77,55 +77,62 @@ export default function ReportPage() {
     }));
   };
 
-  useEffect(() => {
-    async function fetchOrCompleteReport() {
-      try {
-        // First fetch interview
-        const getRes = await fetch(`/api/interviews/${interviewId}`);
-        if (!getRes.ok) {
-          throw new Error("Interview not found");
-        }
-        const data: InterviewWithReport = await getRes.json();
-        setInterview(data);
-
-        if (data.status === "COMPLETED" && data.report) {
-          setReport(data.report);
-          setLoading(false);
-          return;
-        }
-
-        // If not completed yet, trigger completion
-        const completeRes = await fetch(`/api/interviews/${interviewId}/complete`, {
-          method: "POST",
-        });
-
-        const completeData = await completeRes.json();
-
-        if (!completeRes.ok) {
-          setError(completeData.error || "Failed to finalize interview report.");
-          setLoading(false);
-          return;
-        }
-
-        setReport(completeData);
-
-        // Re-fetch updated interview with overall score
-        const refreshedRes = await fetch(`/api/interviews/${interviewId}`);
-        if (refreshedRes.ok) {
-          const refreshedData = await refreshedRes.json();
-          setInterview(refreshedData);
-        }
-      } catch {
-        setError("An error occurred while compiling your final evaluation.");
-      } finally {
-        setLoading(false);
+  const fetchOrCompleteReport = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // First fetch interview
+      const getRes = await fetch(`/api/interviews/${interviewId}`);
+      if (!getRes.ok) {
+        throw new Error("Interview not found");
       }
-    }
+      const data: InterviewWithReport = await getRes.json();
+      setInterview(data);
 
+      if (data.status === "COMPLETED" && data.report) {
+        setReport(data.report);
+        setLoading(false);
+        return;
+      }
+
+      // If not completed yet, trigger completion
+      const completeRes = await fetch(`/api/interviews/${interviewId}/complete`, {
+        method: "POST",
+      });
+
+      const completeData = await completeRes.json();
+
+      if (!completeRes.ok) {
+        setError(
+          completeData.error ||
+            (completeRes.status === 502
+              ? "The AI service is busy right now, please try again in a few seconds."
+              : "Failed to finalize interview report.")
+        );
+        setLoading(false);
+        return;
+      }
+
+      setReport(completeData);
+
+      // Re-fetch updated interview with overall score
+      const refreshedRes = await fetch(`/api/interviews/${interviewId}`);
+      if (refreshedRes.ok) {
+        const refreshedData = await refreshedRes.json();
+        setInterview(refreshedData);
+      }
+    } catch {
+      setError("An error occurred while compiling your final evaluation.");
+    } finally {
+      setLoading(false);
+    }
+  }, [interviewId]);
+
+  useEffect(() => {
     if (interviewId) {
       fetchOrCompleteReport();
     }
-  }, [interviewId]);
+  }, [interviewId, fetchOrCompleteReport]);
 
   if (loading) {
     return (
@@ -150,14 +157,20 @@ export default function ReportPage() {
           </p>
           <div className="flex items-center justify-center gap-3 pt-2">
             <button
+              onClick={() => fetchOrCompleteReport()}
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-colors"
+            >
+              Retry
+            </button>
+            <button
               onClick={() => router.push(`/interview/${interviewId}`)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors"
             >
               Resume Interview
             </button>
             <button
               onClick={() => router.push("/dashboard")}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors"
             >
               Dashboard
             </button>

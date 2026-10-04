@@ -81,7 +81,12 @@ export default function NewInterviewPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to generate interview. Please try again.");
+        setError(
+          data.error ||
+            (res.status === 502
+              ? "The AI service is busy right now, please try again in a few seconds."
+              : "Failed to generate interview. Please try again.")
+        );
         setGenerating(false);
         return;
       }
@@ -122,9 +127,18 @@ export default function NewInterviewPage() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-3 text-rose-400 text-sm">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <span>{error}</span>
+        <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-rose-400 text-sm">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e)}
+            className="self-start sm:self-auto shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 transition-colors"
+          >
+            Retry
+          </button>
         </div>
       )}
 

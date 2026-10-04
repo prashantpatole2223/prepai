@@ -137,7 +137,12 @@ export default function LiveInterviewPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setSubmitError(data.error || "Failed to submit answer. Please try again.");
+        setSubmitError(
+          data.error ||
+            (res.status === 502
+              ? "The AI service is busy right now, please try again in a few seconds."
+              : "Failed to submit answer. Please try again.")
+        );
         setSubmitting(false);
         return;
       }
@@ -329,9 +334,18 @@ export default function LiveInterviewPage() {
         ) : (
           <form onSubmit={handleSubmitAnswer} className="space-y-4">
             {submitError && (
-              <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-2.5 text-rose-400 text-sm">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{submitError}</span>
+              <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-rose-400 text-sm">
+                <div className="flex items-center gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{submitError}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => handleSubmitAnswer(e)}
+                  className="self-start sm:self-auto shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 transition-colors"
+                >
+                  Retry
+                </button>
               </div>
             )}
 

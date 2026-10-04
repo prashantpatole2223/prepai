@@ -2,7 +2,7 @@
 
 PrepAI is a full-stack interview practice platform built with **Next.js 14 (App Router)**, **TypeScript**, **PostgreSQL (Prisma)**, **Auth.js** and the **Google Gemini API**. Users save their skills, take a mock interview with AI-generated questions, get every answer scored with detailed feedback, and receive a final report with a study plan.
 
-**Live demo:** <ADD YOUR VERCEL LINK>
+**Live Demo:** [prepai-coral-theta.vercel.app](https://prepai-coral-theta.vercel.app)
 **Demo login:** `demo@prepai.dev` / `Demo@12345`
 
 ![Dashboard](./screenshots/dashboard.png)

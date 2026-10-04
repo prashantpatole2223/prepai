@@ -1,0 +1,40 @@
+# dependencies
+node_modules
+
+# next.js build output
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# environment variables (never upload)
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# AI planning and tool files
+SPEC.md
+PrepAI_SPEC.md
+PROGRESS.md
+.agent/
+.agents/
+.antigravity/
+.gemini/
+.claude/
+.cursor/
+.windsurf/
+.vscode/
+.idea/
+
+# local shell helper files
+powershell.cmd
+powershell.bat
+
+# logs and OS files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db

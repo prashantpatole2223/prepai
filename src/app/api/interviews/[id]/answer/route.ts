@@ -6,6 +6,8 @@ import { buildEvaluationPrompt } from "@/lib/prompts";
 import { generateJson, AIError } from "@/lib/gemini";
 import { checkAiRateLimit } from "@/lib/ratelimit";
 
+export const maxDuration = 60;
+
 export async function POST(
   req: Request,
   { params }: { params: { id: string } }

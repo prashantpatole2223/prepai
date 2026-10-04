@@ -6,6 +6,8 @@ import { buildQuestionGenerationPrompt } from "@/lib/prompts";
 import { generateJson, AIError } from "@/lib/gemini";
 import { checkAiRateLimit } from "@/lib/ratelimit";
 
+export const maxDuration = 60;
+
 export async function GET() {
   const session = await auth();
 
